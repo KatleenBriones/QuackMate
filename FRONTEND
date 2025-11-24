@@ -1,0 +1,478 @@
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+
+
+public class Main extends Application {
+
+    private ProgressBar funBar = new ProgressBar(0.0);
+    private ProgressBar hungerBar = new ProgressBar(0.0);
+    private ProgressBar cleanBar = new ProgressBar(0.0);
+    private ProgressBar sleepBar = new ProgressBar(0.0);
+
+    private VBox allBarsBox;
+    private MediaPlayer mediaPlayer;
+    private CircularProgress levelCircle = new CircularProgress(80);
+
+    @Override
+    public void start(Stage stage) {
+        Label title = new Label("");
+        title.getStyleClass().add("title-label");
+
+        Label userLabel = new Label("Username:");
+        userLabel.getStyleClass().add("form-label");
+
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Enter username");
+        usernameField.setMaxWidth(220);
+        usernameField.getStyleClass().add("form-field");
+
+        VBox userBox = new VBox(5, userLabel, usernameField);
+        userBox.setAlignment(Pos.CENTER_LEFT);
+        userBox.setMaxWidth(220);
+
+        Label passLabel = new Label("Password:");
+        passLabel.getStyleClass().add("form-label");
+
+        Label error = new Label();
+        error.getStyleClass().add("error-label");
+        error.setVisible(true);
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Enter password");
+        passwordField.setMaxWidth(220);
+        passwordField.getStyleClass().add("form-field");
+
+        VBox passBox = new VBox(5, passLabel, passwordField);
+        passBox.setAlignment(Pos.CENTER_LEFT);
+        passBox.setMaxWidth(220);
+
+        Button loginButton = new Button("🦆 Sign In");
+        loginButton.getStyleClass().add("duck-button");
+        loginButton.setOnAction(e -> {
+            String user = usernameField.getText();
+            String pass = passwordField.getText();
+            if (user.equals("Zashkie") && pass.equals("1234")) {
+                DuckHouse(stage, user);
+            } else {
+                error.setText("Invalid Username or Password");
+                error.setVisible(true);
+            }
+        });
+
+        VBox vbox = new VBox(15, title, userBox, passBox, loginButton, error);
+        vbox.setAlignment(Pos.CENTER);
+
+        VBox.setMargin(userBox, new Insets(60, 0, 0, 0));
+
+        Image bgImage = new Image(getClass().getResource("temporary.png").toExternalForm());
+        ImageView bgView = new ImageView(bgImage);
+        bgView.setPreserveRatio(false);
+
+        StackPane root = new StackPane(bgView, vbox);
+        Scene scene = new Scene(root, 400, 500);
+
+        bgView.fitWidthProperty().bind(scene.widthProperty());
+        bgView.fitHeightProperty().bind(scene.heightProperty());
+
+        scene.getStylesheets().add(getClass().getResource("DuckStyle.css").toExternalForm());
+
+        stage.setTitle("QuackMate - Login");
+        Image icon = new Image(getClass().getResource("/QuackMate.png").toExternalForm());
+        stage.getIcons().add(icon);
+
+        stage.setResizable(false);
+        stage.setScene(scene);
+        stage.setMaximized(false);
+        stage.show();
+
+        String musicFile = getClass().getResource("bgmusic.mp3").toExternalForm();
+        Media sound = new Media(musicFile);
+        mediaPlayer = new MediaPlayer(sound);
+        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        mediaPlayer.play();
+    }
+
+    private void DuckHouse(Stage stage, String username) {
+        sceneTemplate(stage, "balay.png", username);
+    }
+
+    private void kitchen(Stage stage, String username) {
+        sceneTemplate(stage, "eat.png", username);
+    }
+
+    private void bathRoom(Stage stage, String username) {
+        // First, set up the scene normally
+        BorderPane layout = sceneTemplate(stage, "cr.png", username);
+
+        // Create images and buttons
+        Image brush = new Image(getClass().getResource("water (1).png").toExternalForm());
+        Image bucket = new Image(getClass().getResource("scrub.png").toExternalForm());
+
+        ImageView brushView = new ImageView(brush);
+        ImageView bucketView = new ImageView(bucket);
+
+        brushView.setFitHeight(80);
+        brushView.setFitWidth(80);
+        bucketView.setFitHeight(80);
+        bucketView.setFitWidth(80);
+
+        Button brushBtn = new Button();
+        brushBtn.setGraphic(brushView);
+        brushBtn.setStyle("-fx-background-color: transparent;");
+        brushBtn.setOnAction(e -> System.out.println("Nag banlaw ang Itik"));
+
+        Button bucketBtn = new Button();
+        bucketBtn.setGraphic(bucketView);
+        bucketBtn.setStyle("-fx-background-color: transparent;");
+        bucketBtn.setOnAction(e -> System.out.println("Nag lugod ang itik"));
+
+        // Add buttons directly to StackPane
+        StackPane root = (StackPane) stage.getScene().getRoot();
+
+        // Position them
+        StackPane.setAlignment(bucketBtn, Pos.CENTER_LEFT);
+        StackPane.setMargin(bucketBtn, new Insets(0, 0, 100, 20)); // adjust as needed
+
+        StackPane.setAlignment(brushBtn, Pos.CENTER_RIGHT);
+        StackPane.setMargin(brushBtn, new Insets(0, 20, 100, 0)); // adjust as needed
+
+        // Add buttons to the StackPane **without creating a new layout**
+        root.getChildren().addAll(bucketBtn, brushBtn);
+    }
+
+    private void bedRoom(Stage stage, String username) {
+
+        // Set up the base layout
+        BorderPane layout = sceneTemplate(stage, "room.png", username);
+
+        // Images for lamp, background, and character
+        Image lampOff = new Image(getClass().getResource("lambing.png").toExternalForm());
+        Image lampOn  = new Image(getClass().getResource("lamning.png").toExternalForm());
+
+        Image bgOff  = new Image(getClass().getResource("nightver.png").toExternalForm());
+        Image bgOn   = new Image(getClass().getResource("room.png").toExternalForm());
+
+        Image awakeDuck = new Image(getClass().getResource("dockie.png").toExternalForm());
+        Image sleepingDuck = new Image(getClass().getResource("sleepyhead.png").toExternalForm());
+
+        StackPane root = (StackPane) stage.getScene().getRoot();
+        ImageView bgView = (ImageView) root.getChildren().get(0);
+
+        // Assume character ImageView is the last child in StackPane
+        ImageView charac = (ImageView) root.getChildren().get(root.getChildren().size() - 1);
+
+        // Start with lamp ON
+        ImageView lampView = new ImageView(lampOn);
+        lampView.setFitWidth(80);
+        lampView.setPreserveRatio(true);
+
+        ToggleButton lampButton = new ToggleButton();
+        lampButton.setGraphic(lampView);
+        lampButton.getStyleClass().add("lamp-button");
+
+        // Set initial state ON
+        lampButton.setSelected(true);
+        charac.setImage(awakeDuck);
+        bgView.setImage(bgOn);
+
+        lampButton.setOnAction(e -> {
+            if (lampButton.isSelected()) {
+                // TURN ON
+                lampView.setImage(lampOn);
+                bgView.setImage(bgOn);
+
+                charac.setImage(awakeDuck);           // awake character
+                charac.setFitWidth(150);              // same size as original
+                charac.setPreserveRatio(true);
+                StackPane.setMargin(charac, new Insets(0, 0, 180, 0)); // original position
+                System.out.println("Lamp ON");
+            } else {
+                // TURN OFF
+                lampView.setImage(lampOff);
+                bgView.setImage(bgOff);
+
+                charac.setImage(sleepingDuck);        // sleeping character
+                charac.setFitWidth(140);              // same size as original
+                charac.setPreserveRatio(true);
+                StackPane.setMargin(charac, new Insets(0, 0, 160, 0)); // move down slightly
+                System.out.println("Lamp OFF");
+            }
+        });
+
+        double topOffset = 60;
+        double rightOffset = 30;
+        StackPane.setAlignment(lampButton, Pos.TOP_RIGHT);
+        StackPane.setMargin(lampButton, new Insets(topOffset, rightOffset, 0, 0));
+
+        root.getChildren().add(lampButton);
+    }
+
+
+    private void closet(Stage stage, String username) {
+        BorderPane layout = sceneTemplate(stage, "closet.png", username);
+
+        // Left arrow button
+        Button leftArrow = new Button();
+        leftArrow.getStyleClass().add("arrow-button-left");
+        leftArrow.setOnAction(e -> System.out.println("Left arrow clicked!"));
+
+        // Right arrow button
+        Button rightArrow = new Button();
+        rightArrow.getStyleClass().add("arrow-button-right");
+        rightArrow.setOnAction(e -> System.out.println("Right arrow clicked!"));
+
+        // Add arrows to the StackPane
+        StackPane root = (StackPane) stage.getScene().getRoot();
+        StackPane.setAlignment(leftArrow, Pos.CENTER_LEFT);
+        StackPane.setAlignment(rightArrow, Pos.CENTER_RIGHT);
+        StackPane.setMargin(leftArrow, new Insets(0, 0, 0, 10));
+        StackPane.setMargin(rightArrow, new Insets(0, 10, 0, 0));
+
+        root.getChildren().addAll(leftArrow, rightArrow);
+    }
+
+    private BorderPane sceneTemplate(Stage stage, String bgFile, String username) {
+
+        Image backGround = new Image(getClass().getResource(bgFile).toExternalForm());
+        ImageView bg = new ImageView(backGround);
+        bg.setPreserveRatio(false);
+
+        Image character = new Image(getClass().getResource("dockie.png").toExternalForm());
+        ImageView charac = new ImageView(character);
+        charac.setFitWidth(150);
+        charac.setPreserveRatio(true);
+
+        // Duck button in the middle
+        Button duckMenuBtn = new Button("🦆");
+        duckMenuBtn.getStyleClass().add("duck-button");
+        duckMenuBtn.setOnAction(e -> System.out.println("Duck button clicked!"));
+
+        // Game button under the duck
+        Button topPlayBtn = new Button("🎮");
+        topPlayBtn.getStyleClass().add("duck-button");
+        topPlayBtn.setOnAction(e -> GamesFrame(stage, username));
+
+        // Mute/Settings/Switch buttons
+        Button muteBtn = new Button("🔇");
+        muteBtn.getStyleClass().add("mute-button");
+        muteBtn.setOnAction(e -> {
+            if (mediaPlayer != null) {
+                mediaPlayer.setMute(!mediaPlayer.isMute());
+                muteBtn.setText(mediaPlayer.isMute() ? "🔇" : "🔊");
+            }
+        });
+
+        Button settingsBtn = new Button("⚙");
+        settingsBtn.getStyleClass().add("mute-button");
+        settingsBtn.setOnAction(e -> System.out.println("Settings clicked!"));
+
+        ToggleButton switchBtn = new ToggleButton();
+        switchBtn.getStyleClass().add("switch-button");
+        switchBtn.setSelected(false);
+        switchBtn.setOnAction(e -> System.out.println(switchBtn.isSelected() ? "Switch ON" : "Switch OFF"));
+
+        HBox topControls = new HBox(10, settingsBtn, muteBtn, switchBtn);
+        topControls.setAlignment(Pos.CENTER_LEFT);
+
+        VBox leftStack = new VBox(5, topControls, duckMenuBtn, topPlayBtn);
+        leftStack.setAlignment(Pos.TOP_LEFT);
+
+        // Bottom buttons
+        Button btn1 = new Button("🏠");
+        Button btn2 = new Button("🛏");
+        Button btn3 = new Button("\uD83C\uDF73");
+        Button btn4 = new Button("\uD83E\uDDE5");
+        Button btn5 = new Button("🛁");
+
+        Button[] bottomButtons = {btn1, btn2, btn3, btn4, btn5};
+        for (Button btn : bottomButtons) {
+            btn.getStyleClass().add("duck-button");
+            btn.setPrefSize(50, 50);
+        }
+
+        btn1.setOnAction(e -> DuckHouse(stage, username));
+        btn2.setOnAction(e -> bedRoom(stage, username));
+        btn3.setOnAction(e -> kitchen(stage, username));
+        btn4.setOnAction(e -> closet(stage, username));
+        btn5.setOnAction(e -> bathRoom(stage, username));
+
+        HBox bottomRow = new HBox(20, btn1, btn2, btn3, btn4, btn5);
+        bottomRow.setAlignment(Pos.CENTER);
+        bottomRow.setPadding(new Insets(10));
+
+        // Main layout
+        BorderPane layout = new BorderPane();
+        layout.setTop(leftStack);
+        layout.setBottom(bottomRow);
+
+        // Use a StackPane to overlay the duck on top of background and buttons
+        StackPane root = new StackPane(bg, layout, charac);
+        StackPane.setAlignment(charac, Pos.BOTTOM_CENTER);
+        StackPane.setMargin(charac, new Insets(0, 0, 180, 0)); // move duck up 150 px
+
+        Scene scene = new Scene(root, 400, 500);
+        scene.getStylesheets().add(getClass().getResource("DuckStyle.css").toExternalForm());
+
+        bg.fitWidthProperty().bind(scene.widthProperty());
+        bg.fitHeightProperty().bind(scene.heightProperty());
+
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.setMaximized(false);
+        stage.show();
+
+        return layout;
+    }
+
+
+    private void GamesFrame(Stage stage, String username) {
+        Image bg = new Image(getClass().getResource("/game.png").toExternalForm());
+        ImageView backGround = new ImageView(bg);
+        backGround.setPreserveRatio(false);
+
+        Image playIcon = new Image(getClass().getResource("/game2.png").toExternalForm());
+        ImageView playView = new ImageView(playIcon);
+        playView.setFitWidth(200);
+        playView.setFitHeight(200);
+        playView.setPreserveRatio(true);
+
+        Button picBtn = new Button();
+        picBtn.setGraphic(playView);
+        picBtn.getStyleClass().add("duck-button");
+        picBtn.setStyle("-fx-background-radius: 0; -fx-padding: 0;");
+        picBtn.setOnAction(e -> System.out.println("Picture button 1 clicked!"));
+        picBtn.setOnMousePressed(e -> { picBtn.setScaleX(0.9); picBtn.setScaleY(0.9); });
+        picBtn.setOnMouseReleased(e -> { picBtn.setScaleX(1.0); picBtn.setScaleY(1.0); });
+
+        Image playIcon2 = new Image(getClass().getResource("/duckierun.png").toExternalForm());
+        ImageView playView2 = new ImageView(playIcon2);
+        playView2.setFitWidth(200);
+        playView2.setFitHeight(200);
+        playView2.setPreserveRatio(true);
+
+        Button picBtn2 = new Button();
+        picBtn2.setGraphic(playView2);
+        picBtn2.getStyleClass().add("duck-button");
+        picBtn2.setStyle("-fx-background-radius: 0; -fx-padding: 0;");
+        picBtn2.setOnAction(e -> System.out.println("Picture button 2 clicked!"));
+        picBtn2.setOnMousePressed(e -> { picBtn2.setScaleX(0.9); picBtn2.setScaleY(0.9); });
+        picBtn2.setOnMouseReleased(e -> { picBtn2.setScaleX(1.0); picBtn2.setScaleY(1.0); });
+
+        VBox buttonBox = new VBox(20, picBtn, picBtn2);
+        buttonBox.setAlignment(Pos.CENTER);
+
+        Button btn1 = new Button("⬅");
+        btn1.getStyleClass().addAll("duck-button", "house-button");
+        btn1.setPrefSize(50, 50);
+        btn1.setOnAction(e -> DuckHouse(stage, username));
+
+        BorderPane layout = new BorderPane();
+        layout.setTop(btn1);
+        BorderPane.setAlignment(btn1, Pos.TOP_LEFT);
+        layout.setCenter(buttonBox);
+
+        StackPane root = new StackPane(backGround, layout);
+
+        Scene scene = new Scene(root, 400, 500, Color.BLACK);
+        scene.getStylesheets().add(getClass().getResource("/DuckStyle.css").toExternalForm());
+
+        backGround.fitWidthProperty().bind(scene.widthProperty());
+        backGround.fitHeightProperty().bind(scene.heightProperty());
+
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.setMaximized(false);
+        stage.show();
+    }
+
+    private VBox createProgressBox(String labelText, ProgressBar bar) {
+        Label label = new Label(labelText + ":");
+        label.getStyleClass().add("progress-label");
+        bar.setPrefWidth(200);
+        return new VBox(5, label, bar);
+    }
+
+    private void increaseProgress(ProgressBar bar) {
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+
+class CircularProgress extends javafx.scene.canvas.Canvas {
+    private double progress = 0.0;
+    private int level = 1;
+    private Color bgColor = Color.web("#fff9d6");
+    private Color progressColor = Color.web("#ffcc00");
+    private Color innerColor = Color.WHITE;
+    private Color textColor = Color.web("#4A2C00");
+    private String fontFamily = "Comic Sans MS";
+    private double fontSize = 24;
+
+    public CircularProgress(double size) {
+        super(size, size);
+        getStyleClass().add("level-bar");
+        widthProperty().addListener(e -> draw());
+        heightProperty().addListener(e -> draw());
+        draw();
+    }
+    public void setProgress(double value) {
+        this.progress = Math.max(0, Math.min(1, value));
+        draw();
+    }
+    public void setLevel(int level) {
+        this.level = level;
+        draw();
+    }
+
+    public void setColors(Color bg, Color prog, Color inner, Color text) {
+        this.bgColor = bg;
+        this.progressColor = prog;
+        this.innerColor = inner;
+        this.textColor = text;
+        draw();
+    }
+
+    public void setFont(String family, double size) {
+        this.fontFamily = family;
+        this.fontSize = size;
+        draw();
+    }
+
+    private void draw() {
+        double size = getWidth();
+        var gc = getGraphicsContext2D();
+        gc.clearRect(0, 0, size, size);
+
+        gc.setFill(bgColor);
+        gc.fillOval(0, 0, size, size);
+
+        gc.setFill(progressColor);
+        gc.fillArc(0, 0, size, size, 90, -progress * 360, javafx.scene.shape.ArcType.ROUND);
+
+        gc.setFill(innerColor);
+        gc.fillOval(size * 0.15, size * 0.15, size * 0.7, size * 0.7);
+
+        gc.setFill(textColor);
+        gc.setFont(Font.font(fontFamily, fontSize));
+        String text = String.valueOf(level);
+        Text helper = new Text(text);
+        helper.setFont(gc.getFont());
+        double textWidth = helper.getLayoutBounds().getWidth();
+        gc.fillText(text, (size - textWidth) / 2, size * 0.6);
+    }
+}
+
